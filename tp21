@@ -1,0 +1,47 @@
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const app = express();
+
+// Conexão com o MongoDB
+mongoose.connect('mongodb://localhost:27017/seuBanco', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}).then(() => console.log("Conectado ao MongoDB"))
+  .catch((err) => console.log("Erro ao conectar ao MongoDB:", err));
+
+// Definindo o schema e o modelo do MongoDB
+const schema = new mongoose.Schema({
+  campo1: String,
+  campo2: String,
+});
+const Modelo = mongoose.model('NomeDoModelo', schema);
+
+// Configurações do Express
+app.use(bodyParser.urlencoded({ extended: true }));
+app.set('view engine', 'ejs');
+
+// Rota GET para exibir o formulário
+app.get('/formulario', (req, res) => {
+  res.render('formulario');
+});
+
+// Rota POST para salvar dados no MongoDB
+app.post('/suaRota', async (req, res) => {
+  try {
+    const novoRegistro = new Modelo({
+      campo1: req.body.campo1,
+      campo2: req.body.campo2,
+    });
+    await novoRegistro.save();
+    res.send('Dados salvos no MongoDB!');
+  } catch (error) {
+    res.status(500).send('Erro ao salvar os dados');
+  }
+});
+
+// Inicializando o servidor
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(Servidor rodando em http://localhost:${PORT});
+});
